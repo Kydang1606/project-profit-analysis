@@ -1,14 +1,12 @@
-# 📊 Project Profit Analysis App
+# 📊 Ứng Dụng Phân Tích Lợi Nhuận Dự Án
 
-Ứng dụng Streamlit để phân tích lợi nhuận và so sánh chi phí dự toán vs. thực tế cho các dự án sản xuất.
+## 🧩 Tính năng
+- Nhập số giờ và đơn giá trực tiếp
+- Tự động tính chi phí VND & USD
+- Hiển thị chênh lệch, lợi nhuận, biểu đồ
+- Không cần upload file
 
-## 🚀 Tính năng
-- Nhập dữ liệu trực tiếp trên giao diện
-- So sánh giờ công, máy móc, vật tư dự toán và thực tế
-- Tính biên lợi nhuận kế hoạch và thực tế
-- Hiển thị bảng dữ liệu và biểu đồ tương tác
-
-## 📦 Cài đặt
+## 🚀 Chạy ứng dụng
 
 ```bash
 pip install -r requirements.txt
