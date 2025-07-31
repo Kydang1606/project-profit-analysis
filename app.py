@@ -3,12 +3,12 @@ import pandas as pd
 import plotly.express as px
 
 # Giá cố định (USD/hour hoặc USD unit)
-LABOR_COST_WORKER = 10.0
-LABOR_COST_OFFICE = 15.0
+LABOR_COST_WORKER = 13.41
+LABOR_COST_OFFICE = 31.25
 MACHINE_COST = {
-    'CNC': 20.0,
-    'Robot': 25.0,
-    'Autoclave': 30.0
+    'CNC': 18.33,
+    'Robot': 19.79,
+    'Autoclave': 49.98
 }
 
 st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
