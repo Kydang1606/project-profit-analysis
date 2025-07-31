@@ -25,7 +25,7 @@ logo = Image.open("triac_logo.png")
 st.image(logo, width=150)  # bạn có thể chỉnh width nếu cần
 
 st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
-st.title("Triac Composites Cost Estimation & Comparison Dashboard")
+st.title("Triac Project Budget Monitor")
 
 # === Project Info ===
 st.markdown("### 📁 Project Information")
