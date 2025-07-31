@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import io
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
 
 # === Constants ===
 LABOR_COST_WORKER = 13.41
@@ -79,6 +82,13 @@ for category in est_cost:
         "Difference (%)": round(percent_diff, 2)
     })
 summary_df = pd.DataFrame(data)
+
+# 🔢 Format USD with $ and comma
+summary_df["Estimated (USD)"] = summary_df["Estimated (USD)"].apply(lambda x: f"${x:,.2f}")
+summary_df["Actual (USD)"] = summary_df["Actual (USD)"].apply(lambda x: f"${x:,.2f}")
+summary_df["Difference (USD)"] = summary_df["Difference (USD)"].apply(lambda x: f"${x:,.2f}")
+summary_df["Difference (%)"] = summary_df["Difference (%)"].apply(lambda x: f"{x:.2f}%")
+
 st.dataframe(summary_df, use_container_width=True)
 
 # === Pie Charts ===
@@ -121,11 +131,50 @@ final_df = pd.DataFrame({
         round((act_total_with_extra - est_total) / est_total * 100, 2) if est_total != 0 else 0.0
     ]
 })
+
+# 🔢 Format final values
+final_df["Value (USD)"] = final_df["Value (USD)"].apply(
+    lambda x: f"${x:,.2f}" if isinstance(x, (int, float)) else x
+)
+
 st.dataframe(final_df, use_container_width=True)
 
 # === Fixed Unit Cost Info ===
 st.markdown("### 4. Fixed Unit Costs (USD/hour)")
-st.write(f"👷 Labor - Worker: ${LABOR_COST_WORKER:.2f} | 🧑‍💼 Office: ${LABOR_COST_OFFICE:.2f}")
+st.write(f"👷 Labor - Worker: ${LABOR_COST_WORKER:,.2f} | 🧑‍💼 Office: ${LABOR_COST_OFFICE:,.2f}")
 st.write("🛠️ Machine Rates:")
 for machine, cost in MACHINE_COST.items():
-    st.write(f"- {machine}: ${cost:.2f} per hour")
+    st.write(f"- {machine}: ${cost:,.2f} per hour")
+st.markdown("### 📥 Export Report")
+
+# Tạo Excel file trong bộ nhớ
+output = io.BytesIO()
+wb = Workbook()
+
+# === Sheet 1: Project Info ===
+ws_info = wb.active
+ws_info.title = "Project Info"
+ws_info.append(["Project Name", project_name])
+ws_info.append(["Start Date", start_date.strftime("%Y-%m-%d")])
+ws_info.append(["End Date", end_date.strftime("%Y-%m-%d")])
+
+# === Sheet 2: Summary Table ===
+ws_summary = wb.create_sheet("Cost Summary")
+for r in dataframe_to_rows(summary_df, index=False, header=True):
+    ws_summary.append(r)
+
+# === Sheet 3: Final Comparison ===
+ws_final = wb.create_sheet("Final Comparison")
+for r in dataframe_to_rows(final_df, index=False, header=True):
+    ws_final.append(r)
+
+wb.save(output)
+output.seek(0)
+
+# Tải file Excel
+st.download_button(
+    label="📤 Download Excel Report",
+    data=output,
+    file_name=f"{project_name.replace(' ', '_')}_report.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
