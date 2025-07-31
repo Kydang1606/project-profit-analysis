@@ -1,89 +1,118 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
-# Fixed unit prices (USD/hour)
-UNIT_PRICES = {
-    'Labor': 10,
-    'Office': 15,
-    'CNC': 25,
-    'Robot': 30,
-    'Autoclave': 35,
+# Giá cố định (USD/hour hoặc USD unit)
+LABOR_COST_WORKER = 10.0
+LABOR_COST_OFFICE = 15.0
+MACHINE_COST = {
+    'CNC': 20.0,
+    'Robot': 25.0,
+    'Autoclave': 30.0
 }
 
-st.title("💰 Cost Comparison Tool")
+st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
+st.title("📊 Cost Estimation & Comparison Dashboard")
 
-st.markdown("## 📥 Input Estimated Cost")
-with st.form("estimate_form"):
-    est_labor = st.number_input("Labor Hours (Estimated)", min_value=0.0, step=1.0)
-    est_office = st.number_input("Office Hours (Estimated)", min_value=0.0, step=1.0)
-    est_cnc = st.number_input("CNC Hours (Estimated)", min_value=0.0, step=1.0)
-    est_robot = st.number_input("Robot Hours (Estimated)", min_value=0.0, step=1.0)
-    est_autoclave = st.number_input("Autoclave Hours (Estimated)", min_value=0.0, step=1.0)
-    est_material = st.number_input("Material Cost (Estimated, USD)", min_value=0.0, step=10.0)
-    margin_percent = st.number_input("Margin (%)", min_value=0.0, step=0.5)
+st.markdown("### 1. Input Estimate and Actual Data")
 
-    submitted_est = st.form_submit_button("Submit Estimated Cost")
+with st.expander("🔧 Estimated Cost Input"):
+    est_labor_worker = st.number_input("Estimated Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f")
+    est_labor_office = st.number_input("Estimated Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f")
+    est_machine = {}
+    for machine in MACHINE_COST:
+        est_machine[machine] = st.number_input(f"Estimated Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f")
+    est_material = st.number_input("Estimated Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
+    margin = st.number_input("Margin (%)", min_value=0.0, step=1.0, format="%.2f")
 
-st.markdown("---")
-st.markdown("## 📥 Input Actual Cost")
-with st.form("actual_form"):
-    act_labor = st.number_input("Labor Hours (Actual)", min_value=0.0, step=1.0)
-    act_office = st.number_input("Office Hours (Actual)", min_value=0.0, step=1.0)
-    act_cnc = st.number_input("CNC Hours (Actual)", min_value=0.0, step=1.0)
-    act_robot = st.number_input("Robot Hours (Actual)", min_value=0.0, step=1.0)
-    act_autoclave = st.number_input("Autoclave Hours (Actual)", min_value=0.0, step=1.0)
-    act_material = st.number_input("Material Cost (Actual, USD)", min_value=0.0, step=10.0)
+with st.expander("📌 Actual Cost Input"):
+    act_labor_worker = st.number_input("Actual Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f")
+    act_labor_office = st.number_input("Actual Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f")
+    act_machine = {}
+    for machine in MACHINE_COST:
+        act_machine[machine] = st.number_input(f"Actual Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f")
+    act_material = st.number_input("Actual Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
 
-    submitted_act = st.form_submit_button("Submit Actual Cost")
+# === Tính toán chi tiết ===
+# Estimate cost breakdown
+est_cost = {
+    "Labor - Worker": est_labor_worker * LABOR_COST_WORKER,
+    "Labor - Office": est_labor_office * LABOR_COST_OFFICE,
+    "Material": est_material
+}
+for machine in MACHINE_COST:
+    est_cost[machine] = est_machine[machine] * MACHINE_COST[machine]
 
-if submitted_est and submitted_act:
-    # Calculate estimated cost
-    est_costs = {
-        'Labor': est_labor * UNIT_PRICES['Labor'],
-        'Office': est_office * UNIT_PRICES['Office'],
-        'CNC': est_cnc * UNIT_PRICES['CNC'],
-        'Robot': est_robot * UNIT_PRICES['Robot'],
-        'Autoclave': est_autoclave * UNIT_PRICES['Autoclave'],
-        'Material': est_material,
-    }
-    total_estimate = sum(est_costs.values())
-    selling_price = total_estimate * (1 + margin_percent / 100)
+est_total = sum(est_cost.values())
+est_selling_price = est_total * (1 + margin / 100)
 
-    # Calculate actual cost
-    act_costs = {
-        'Labor': act_labor * UNIT_PRICES['Labor'],
-        'Office': act_office * UNIT_PRICES['Office'],
-        'CNC': act_cnc * UNIT_PRICES['CNC'],
-        'Robot': act_robot * UNIT_PRICES['Robot'],
-        'Autoclave': act_autoclave * UNIT_PRICES['Autoclave'],
-        'Material': act_material,
-    }
-    total_actual = sum(act_costs.values())
+# Actual cost breakdown
+act_cost = {
+    "Labor - Worker": act_labor_worker * LABOR_COST_WORKER,
+    "Labor - Office": act_labor_office * LABOR_COST_OFFICE,
+    "Material": act_material
+}
+for machine in MACHINE_COST:
+    act_cost[machine] = act_machine[machine] * MACHINE_COST[machine]
 
-    # Create DataFrame for output
-    data = []
-    for key in est_costs:
-        data.append({
-            'Category': key,
-            'Estimated Cost': est_costs[key],
-            'Actual Cost': act_costs[key],
-            'Difference': act_costs[key] - est_costs[key],
-        })
-    df = pd.DataFrame(data)
-    df.loc[len(df)] = {
-        'Category': 'TOTAL',
-        'Estimated Cost': total_estimate,
-        'Actual Cost': total_actual,
-        'Difference': total_actual - total_estimate,
-    }
+act_total = sum(act_cost.values())
 
-    # Display results
-    st.markdown("## 📊 Cost Comparison")
-    st.dataframe(df.style.format({
-        'Estimated Cost': '${:,.2f}',
-        'Actual Cost': '${:,.2f}',
-        'Difference': '${:,.2f}',
-    }))
+# === Hiển thị kết quả ===
+st.markdown("### 2. Summary Table")
+data = []
+for category in est_cost:
+    data.append({
+        "Category": category,
+        "Estimated (USD)": est_cost[category],
+        "Actual (USD)": act_cost.get(category, 0.0)
+    })
+summary_df = pd.DataFrame(data)
+summary_df["Difference (USD)"] = summary_df["Estimated (USD)"] - summary_df["Actual (USD)"]
+st.dataframe(summary_df, use_container_width=True)
 
-    st.markdown(f"**💰 Selling Price (with {margin_percent:.1f}% margin):** ${selling_price:,.2f}")
-    st.markdown(f"**📉 Profit / Loss:** ${selling_price - total_actual:,.2f}")
+# === Biểu đồ tròn tỷ lệ ===
+col1, col2 = st.columns(2)
+with col1:
+    fig1 = px.pie(values=list(est_cost.values()), names=list(est_cost.keys()), title="Estimated Cost Composition")
+    st.plotly_chart(fig1, use_container_width=True)
+with col2:
+    fig2 = px.pie(values=list(act_cost.values()), names=list(act_cost.keys()), title="Actual Cost Composition")
+    st.plotly_chart(fig2, use_container_width=True)
+
+# === Biểu đồ cột so sánh ===
+chart_df = pd.DataFrame({
+    "Category": list(est_cost.keys()),
+    "Estimated": list(est_cost.values()),
+    "Actual": [act_cost[k] for k in est_cost.keys()]
+})
+fig3 = px.bar(chart_df, x="Category", y=["Estimated", "Actual"], barmode="group", title="Cost Comparison by Category")
+st.plotly_chart(fig3, use_container_width=True)
+
+# === Tổng kết ===
+st.markdown("### 3. Final Comparison")
+final_df = pd.DataFrame({
+    "Item": [
+        "Original Estimate (no margin)",
+        "Selling Price (with margin)",
+        "Actual Cost",
+        "Gap: Estimate vs Actual",
+        "Gap: Selling Price vs Actual",
+        "Profit Margin (%)"
+    ],
+    "Value (USD)": [
+        est_total,
+        est_selling_price,
+        act_total,
+        est_total - act_total,
+        est_selling_price - act_total,
+        round((est_selling_price - act_total) / est_selling_price * 100, 2) if est_selling_price > 0 else 0.0
+    ]
+})
+st.dataframe(final_df, use_container_width=True)
+
+# === Hiển thị giá từng loại ===
+st.markdown("### 4. Fixed Unit Costs (USD/hour)")
+st.write(f"👷 Labor - Worker: ${LABOR_COST_WORKER:.2f} | 🧑‍💼 Office: ${LABOR_COST_OFFICE:.2f}")
+st.write("🛠️ Machine Rates:")
+for machine, cost in MACHINE_COST.items():
+    st.write(f"- {machine}: ${cost:.2f} per hour")
