@@ -32,17 +32,24 @@ st.markdown("### 📁 Project Information")
 project_name = st.text_input("Project Name")
 start_date = st.date_input("Start Date")
 end_date = st.date_input("End Date")
+def parse_number_input(label, default=0.0):
+    raw = st.text_input(label, value=f"{default:,.2f}")
+    try:
+        # Loại dấu phẩy, rồi chuyển sang float
+        return round(float(raw.replace(",", "")), 2)
+    except:
+        return 0.0
 
 # === Inputs ===
 st.markdown("### 1. Input Estimate and Actual Data")
 
 with st.expander("🔧 Estimated Cost Input"):
-    est_labor_worker = round(st.number_input("Estimated Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f"), 2)
-    est_labor_office = round(st.number_input("Estimated Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f"), 2)
+    est_labor_worker = parse_number_input("Estimated Labor Hours - Worker")
+    est_labor_office = parse_number_input("Estimated Labor Hours - Office")
     est_machine = {}
     for machine in MACHINE_COST:
-        est_machine[machine] = round(st.number_input(f"Estimated Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f"), 2)
-    est_material = round(st.number_input("Estimated Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f"), 2)
+        est_machine[machine] = parse_number_input(f"Estimated Machine Hours - {machine}")
+    est_material = parse_number_input("Estimated Material Cost (USD)")
 
 with st.expander("📌 Actual Cost Input"):
     act_labor_worker = round(st.number_input("Actual Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f"), 2)
