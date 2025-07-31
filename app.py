@@ -1,68 +1,94 @@
-# app.py
-import streamlit as st
-from utils import calculate_costs
-from constants import HOURLY_RATES
+# Streamlit Cost Comparison App
 
-st.set_page_config(page_title="Cost Estimation App", layout="wide")
-st.title("📊 Cost Estimation & Comparison Tool")
+This app allows users to input estimated and actual cost data for composite manufacturing projects. It automatically calculates and compares costs by labor, office work, machinery, and material. Pricing is fixed and displayed for transparency.
 
-st.subheader("1. Input Time and Material Cost")
+## 💰 Fixed Unit Prices (USD)
+| Category        | Unit Price (USD/hour) |
+|----------------|------------------------|
+| Labor          | 10                     |
+| Office         | 15                     |
+| CNC            | 25                     |
+| Robot          | 30                     |
+| Autoclave      | 35                     |
 
-col1, col2 = st.columns(2)
+## 🧮 Sections
 
-with col1:
-    worker_hours = st.number_input("👷‍♂️ Worker Hours", min_value=0.0, format="%.2f")
-    office_hours = st.number_input("🧑‍💼 Office Hours", min_value=0.0, format="%.2f")
-    cnc_hours = st.number_input("🛠 CNC Hours", min_value=0.0, format="%.2f")
-    robot_hours = st.number_input("🤖 Robot Hours", min_value=0.0, format="%.2f")
-    autoclave_hours = st.number_input("🔥 Autoclave Hours", min_value=0.0, format="%.2f")
+### 1. Input Estimated Cost (Estimate Sheet)
+Input estimated values for each component:
+- Labor hours
+- Office hours
+- CNC hours
+- Robot hours
+- Autoclave hours
+- Material cost (USD)
+- Margin (%)
 
-with col2:
-    material_cost = st.number_input("🧱 Material Cost (USD)", min_value=0.0, format="%.2f")
-    actual_cost = st.number_input("💰 Actual Incurred Cost (USD)", min_value=0.0, format="%.2f")
-    profit_margin = st.slider("📈 Profit Margin (%)", min_value=0, max_value=100, value=20)
+**Example Input Table:**
+| Category     | Unit      | Value (Estimated) |
+|--------------|-----------|-------------------|
+| Labor Hours  | hr        | 200               |
+| Office Hours | hr        | 50                |
+| CNC Hours    | hr        | 30                |
+| Robot Hours  | hr        | 10                |
+| Autoclave    | hr        | 15                |
+| Material     | USD       | 5,000             |
+| Margin       | %         | 15                |
 
-# Show fixed rates
-with st.expander("🔧 Hourly Rates (Fixed)"):
-    st.write(HOURLY_RATES)
+### 2. Input Actual Cost (Actual Sheet)
+Input actual values similarly:
+- Labor hours
+- Office hours
+- CNC hours
+- Robot hours
+- Autoclave hours
+- Material cost (USD)
 
-# Calculate
-if st.button("🧮 Calculate & Compare"):
-    input_data = {
-        "Worker Hours": worker_hours,
-        "Office Hours": office_hours,
-        "CNC Hours": cnc_hours,
-        "Robot Hours": robot_hours,
-        "Autoclave Hours": autoclave_hours,
-        "Material Cost": material_cost,
-    }
+**Example Input Table:**
+| Category     | Unit      | Value (Actual)    |
+|--------------|-----------|-------------------|
+| Labor Hours  | hr        | 220               |
+| Office Hours | hr        | 40                |
+| CNC Hours    | hr        | 35                |
+| Robot Hours  | hr        | 12                |
+| Autoclave    | hr        | 10                |
+| Material     | USD       | 5,200             |
 
-    result = calculate_costs(input_data, profit_margin)
+### 3. Output Comparison Table
+Automatically compute:
+- Cost by category (Estimated)
+- Cost by category (Actual)
+- Total cost (Estimated)
+- Selling Price = Total Estimate × (1 + Margin)
+- Total Actual Cost
+- Comparison between:
+  - Estimated vs Actual
+  - Estimated vs Selling Price
+  - Selling Price vs Actual
 
-    st.subheader("2. 📋 Cost Breakdown")
-    st.write({
-        "Worker Cost (USD)": result["Cost (Worker)"],
-        "Office Cost (USD)": result["Cost (Office)"],
-        "Machine Cost (USD)": result["Cost (Machines)"],
-        "Material Cost (USD)": result["Cost (Material)"],
-        "Total Estimated Cost": result["Total Cost"],
-        "Estimated Base Price": result["Base Price"],
-        "Selling Price (USD)": result["Selling Price"],
-    })
+**Example Output Table:**
+| Category     | Estimated Cost | Actual Cost | Difference |
+|--------------|----------------|-------------|------------|
+| Labor        | $2,000         | $2,200      | $200       |
+| Office       | $750           | $600        | -$150      |
+| CNC          | $750           | $875        | $125       |
+| Robot        | $300           | $360        | $60        |
+| Autoclave    | $525           | $350        | -$175      |
+| Material     | $5,000         | $5,200      | $200       |
+| **Total**    | **$9,325**     | **$9,585**  | **$260**   |
+| Margin       | 15%            | N/A         | N/A        |
+| **Selling Price** | **$10,724**    |             |            |
 
-    st.subheader("3. 📈 Comparison Table")
+## 📌 Notes
+- Unit prices are **fixed** and **not editable** via UI.
+- All inputs support decimal numbers (e.g., `10.5`).
+- All currency is in **USD** only.
 
-    comparison_data = {
-        "Metric": [
-            "Estimated Base Price",
-            "Selling Price (with Profit)",
-            "Actual Incurred Cost"
-        ],
-        "Value (USD)": [
-            result["Base Price"],
-            result["Selling Price"],
-            actual_cost
-        ]
-    }
+---
 
-    st.table(comparison_data)
+Next steps:
+- Create a `streamlit_app.py` file implementing this UI logic.
+- Layout: Two columns side-by-side for Estimate vs Actual input.
+- Output section below for computed comparison table.
+- Optional export to Excel or PDF.
+
+Let me know if you'd like the full Python/Streamlit code for this logic!
