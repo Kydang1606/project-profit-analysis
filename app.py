@@ -8,6 +8,7 @@ from fpdf import FPDF
 import tempfile
 import plotly.io as pio
 
+
 # === Constants ===
 LABOR_COST_WORKER = 13.41
 LABOR_COST_OFFICE = 31.25
@@ -194,6 +195,7 @@ pio.write_image(fig2, pie2_img.name, format='png', width=500, height=400)
 pdf = FPDF(orientation='P', unit='mm', format='A4')
 pdf.add_page()
 
+# Tiêu đề
 pdf.set_font("Arial", 'B', 14)
 pdf.cell(0, 10, "Project Cost Summary Report", ln=True)
 
@@ -203,29 +205,22 @@ pdf.cell(0, 10, f"Project: {project_name}", ln=True)
 pdf.cell(0, 10, f"Duration: {start_date} to {end_date}", ln=True)
 pdf.ln(5)
 
-# Thêm hình biểu đồ
-pdf.image(bar_img.name, x=10, w=190)
-pdf.ln(5)
-pdf.image(pie1_img.name, x=10, y=pdf.get_y(), w=90)
-pdf.image(pie2_img.name, x=110, y=pdf.get_y(), w=90)
-pdf.ln(80)
-
-# Thêm bảng tóm tắt cuối
+# Final Summary Table
 pdf.set_font("Arial", 'B', 12)
 pdf.cell(0, 10, "Final Summary", ln=True)
 pdf.set_font("Arial", '', 11)
 for idx, row in final_df.iterrows():
     pdf.cell(0, 8, f"{row['Item']}: {row['Value (USD)']}", ln=True)
 
-# Xuất ra file PDF
+# Xuất ra PDF file trong bộ nhớ
 pdf_output = io.BytesIO()
 pdf.output(pdf_output)
 pdf_output.seek(0)
 
-# Nút tải file PDF
+# Nút tải PDF
 st.download_button(
-    label="📄 Download PDF Report",
+    label="📄 Download PDF Report (No Chart)",
     data=pdf_output,
-    file_name=f"{project_name.replace(' ', '_')}_report.pdf",
+    file_name=f"{project_name.replace(' ', '_')}_summary.pdf",
     mime="application/pdf"
 )
