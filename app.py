@@ -248,7 +248,8 @@ if os.path.exists(pie2_path) and os.path.getsize(pie2_path) > 0:
     pdf.image(pie2_path, x=110, w=90)
 
 pdf_output = io.BytesIO()
-pdf.output(pdf_output)
+pdf_bytes = pdf.output(dest='S').encode('latin-1')
+pdf_output = io.BytesIO(pdf_bytes)
 pdf_output.seek(0)
 
 st.download_button(
