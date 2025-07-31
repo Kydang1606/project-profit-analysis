@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import io
+import os
 import tempfile               # ✅ THÊM DÒNG NÀY
 import matplotlib.pyplot as plt
 from openpyxl import Workbook
@@ -239,8 +240,12 @@ pdf.ln(5)
 pdf.set_font("Arial", 'B', 12)
 pdf.cell(0, 10, "Charts", ln=True)
 pdf.image(bar_chart_path, w=180)
-pdf.image(pie1_path, x=10, w=90)
-pdf.image(pie2_path, x=110, w=90)
+# Pie chart 1: Estimated
+if os.path.exists(pie1_path) and os.path.getsize(pie1_path) > 0:
+    pdf.image(pie1_path, x=10, w=90)
+# Pie chart 2: Actual
+if os.path.exists(pie2_path) and os.path.getsize(pie2_path) > 0:
+    pdf.image(pie2_path, x=110, w=90)
 
 pdf_output = io.BytesIO()
 pdf.output(pdf_output)
