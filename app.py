@@ -202,10 +202,11 @@ fig_final.update_layout(
 st.plotly_chart(fig_final, use_container_width=True)
 
 # 🔢 Format final values
-final_df["Value (USD)"] = final_df["Value (USD)"].apply(
-    lambda x: f"${x:,.2f}" if isinstance(x, (int, float)) else x
+final_df["Value (USD)"] = final_df.apply(
+    lambda row: f"{row['Value (USD)']:.2f}%" if "Gap (%)" in row["Item"]
+    else f"${row['Value (USD)']:,.2f}",
+    axis=1
 )
-
 st.dataframe(final_df, use_container_width=True)
 
 # === Fixed Unit Cost Info ===
