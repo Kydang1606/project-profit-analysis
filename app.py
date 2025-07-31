@@ -175,7 +175,7 @@ final_df = pd.DataFrame({
 final_df_plot = final_df.copy()
 
 # 👉 Loại bỏ dòng phần trăm vì không phải giá trị USD
-final_df_plot = final_df_plot[~final_df_plot["Item"].str.contains("Gap \\(\\%)")]
+final_df_plot = final_df_plot[~final_df_plot["Item"].str.contains(r"Gap \(%\)")]
 
 # 👉 Chuyển cột Value về số để vẽ biểu đồ
 final_df_plot["Value (USD)"] = final_df_plot["Value (USD)"].astype(float)
