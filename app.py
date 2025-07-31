@@ -89,7 +89,7 @@ data = []
 for category in est_cost:
     estimated = est_cost[category]
     actual = act_cost.get(category, 0.0)
-    diff = actual - estimated
+    diff = estimated - actual 
     percent_diff = (diff / estimated * 100) if estimated != 0 else 0
     data.append({
         "Category": category,
