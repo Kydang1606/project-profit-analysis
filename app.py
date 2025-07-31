@@ -178,7 +178,7 @@ final_df_plot = final_df.copy()
 final_df_plot = final_df_plot[~final_df_plot["Item"].str.contains("Gap \\(\\%)")]
 
 # 👉 Chuyển cột Value về số để vẽ biểu đồ
-final_df_plot["Value (USD)"] = final_df_plot["Value (USD)"].replace('[\$,]', '', regex=True).astype(float)
+final_df_plot["Value (USD)"] = final_df_plot["Value (USD)"].astype(float)
 
 fig_final = px.bar(
     final_df_plot,
