@@ -2,10 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import io
+import tempfile               # ✅ THÊM DÒNG NÀY
+import matplotlib.pyplot as plt
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from fpdf import FPDF
-import matplotlib.pyplot as plt
 
 
 
