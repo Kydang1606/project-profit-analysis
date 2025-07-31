@@ -20,12 +20,13 @@ MACHINE_COST = {
     'Robot': 19.79,
     'Autoclave': 49.98
 }
-
-st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
-st.title("📊 Cost Estimation & Comparison Dashboard")
 # Hiển thị logo trong giao diện
 logo = Image.open("triac_logo.png")
 st.image(logo, width=150)  # bạn có thể chỉnh width nếu cần
+
+st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
+st.title("Triac Composites Cost Estimation & Comparison Dashboard")
+
 # === Project Info ===
 st.markdown("### 📁 Project Information")
 project_name = st.text_input("Project Name")
