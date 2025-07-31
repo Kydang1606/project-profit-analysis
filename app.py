@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from fpdf import FPDF
+from PIL import Image
 
 
 
