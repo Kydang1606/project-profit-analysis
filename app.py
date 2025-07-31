@@ -100,7 +100,29 @@ for category in est_cost:
     })
 summary_df = pd.DataFrame(data)
 
-# 🔢 Format USD with $ and comma
+# 📊 Biểu đồ Cột: Difference (USD)
+fig_diff = px.bar(
+    summary_df,
+    x="Category", y="Difference (USD)",
+    title="Cost Difference by Category (USD)",
+    color="Difference (USD)",
+    color_continuous_scale='RdYlGn'
+)
+fig_diff.update_traces(
+    text=summary_df["Difference (USD)"].apply(lambda x: f"${x:,.2f}"),
+    textposition="outside"
+)
+fig_diff.update_layout(
+    yaxis_title="USD",
+    xaxis_title="Category",
+    uniformtext_minsize=8,
+    uniformtext_mode='hide',
+    margin=dict(t=60, b=40),
+    height=400
+)
+st.plotly_chart(fig_diff, use_container_width=True)
+
+# 🔢 Format bảng sau khi biểu đồ đã dùng số thật
 summary_df["Estimated (USD)"] = summary_df["Estimated (USD)"].apply(lambda x: f"${x:,.2f}")
 summary_df["Actual (USD)"] = summary_df["Actual (USD)"].apply(lambda x: f"${x:,.2f}")
 summary_df["Difference (USD)"] = summary_df["Difference (USD)"].apply(lambda x: f"${x:,.2f}")
@@ -148,6 +170,36 @@ final_df = pd.DataFrame({
         round((act_total_with_extra - est_total) / est_total * 100, 2) if est_total != 0 else 0.0
     ]
 })
+# 📊 Biểu đồ Cột: Final Comparison (USD)
+# 👉 Tạo bản sao để vẽ biểu đồ trước khi định dạng thành chuỗi
+final_df_plot = final_df.copy()
+
+# 👉 Loại bỏ dòng phần trăm vì không phải giá trị USD
+final_df_plot = final_df_plot[~final_df_plot["Item"].str.contains("Gap \\(\\%)")]
+
+# 👉 Chuyển cột Value về số để vẽ biểu đồ
+final_df_plot["Value (USD)"] = final_df_plot["Value (USD)"].replace('[\$,]', '', regex=True).astype(float)
+
+fig_final = px.bar(
+    final_df_plot,
+    x="Item", y="Value (USD)",
+    title="Final Cost Comparison (USD)",
+    text=final_df_plot["Value (USD)"].apply(lambda x: f"${x:,.2f}"),
+    color="Value (USD)",
+    color_continuous_scale="Blues"
+)
+fig_final.update_traces(textposition="outside")
+fig_final.update_layout(
+    xaxis_title="",
+    yaxis_title="USD",
+    uniformtext_minsize=8,
+    uniformtext_mode='hide',
+    margin=dict(t=60, b=40),
+    height=420
+)
+
+# 🖼️ Hiển thị biểu đồ
+st.plotly_chart(fig_final, use_container_width=True)
 
 # 🔢 Format final values
 final_df["Value (USD)"] = final_df["Value (USD)"].apply(
