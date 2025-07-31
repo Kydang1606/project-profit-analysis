@@ -4,6 +4,9 @@ import plotly.express as px
 import io
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from fpdf import FPDF
+import tempfile
+import plotly.io as pio
 
 # === Constants ===
 LABOR_COST_WORKER = 13.41
@@ -177,4 +180,52 @@ st.download_button(
     data=output,
     file_name=f"{project_name.replace(' ', '_')}_report.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+# Chuyển biểu đồ sang ảnh PNG
+bar_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+pie1_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+pie2_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+
+pio.write_image(fig3, bar_img.name, format='png', width=900, height=500)
+pio.write_image(fig1, pie1_img.name, format='png', width=500, height=400)
+pio.write_image(fig2, pie2_img.name, format='png', width=500, height=400)
+
+# Tạo PDF
+pdf = FPDF(orientation='P', unit='mm', format='A4')
+pdf.add_page()
+
+pdf.set_font("Arial", 'B', 14)
+pdf.cell(0, 10, "Project Cost Summary Report", ln=True)
+
+# Project Info
+pdf.set_font("Arial", '', 12)
+pdf.cell(0, 10, f"Project: {project_name}", ln=True)
+pdf.cell(0, 10, f"Duration: {start_date} to {end_date}", ln=True)
+pdf.ln(5)
+
+# Thêm hình biểu đồ
+pdf.image(bar_img.name, x=10, w=190)
+pdf.ln(5)
+pdf.image(pie1_img.name, x=10, y=pdf.get_y(), w=90)
+pdf.image(pie2_img.name, x=110, y=pdf.get_y(), w=90)
+pdf.ln(80)
+
+# Thêm bảng tóm tắt cuối
+pdf.set_font("Arial", 'B', 12)
+pdf.cell(0, 10, "Final Summary", ln=True)
+pdf.set_font("Arial", '', 11)
+for idx, row in final_df.iterrows():
+    pdf.cell(0, 8, f"{row['Item']}: {row['Value (USD)']}", ln=True)
+
+# Xuất ra file PDF
+pdf_output = io.BytesIO()
+pdf.output(pdf_output)
+pdf_output.seek(0)
+
+# Nút tải file PDF
+st.download_button(
+    label="📄 Download PDF Report",
+    data=pdf_output,
+    file_name=f"{project_name.replace(' ', '_')}_report.pdf",
+    mime="application/pdf"
 )
