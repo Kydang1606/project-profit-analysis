@@ -58,7 +58,7 @@ Automatically compute:
 - Cost by category (Estimated)
 - Cost by category (Actual)
 - Total cost (Estimated)
-- Selling Price = Total Estimate × (1 + Margin)
+- Selling Price = Total Estimate × (1 * Margin)
 - Total Actual Cost
 - Comparison between:
   - Estimated vs Actual
