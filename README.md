@@ -1,12 +1,12 @@
-# 📊 Ứng Dụng Phân Tích Lợi Nhuận Dự Án
+# 📊 # Cost Estimation & Comparison App
 
-## 🧩 Tính năng
-- Nhập số giờ và đơn giá trực tiếp
-- Tự động tính chi phí VND & USD
-- Hiển thị chênh lệch, lợi nhuận, biểu đồ
-- Không cần upload file
+An interactive Streamlit app to:
+- Input work hours and material cost
+- Compute total estimated cost
+- Add profit margin
+- Compare estimated price vs actual cost
 
-## 🚀 Chạy ứng dụng
+## Run Locally
 
 ```bash
 pip install -r requirements.txt
