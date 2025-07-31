@@ -5,8 +5,8 @@ import io
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from fpdf import FPDF
-import tempfile
-import plotly.io as pio
+import matplotlib.pyplot as plt
+
 
 
 # === Constants ===
@@ -182,45 +182,70 @@ st.download_button(
     file_name=f"{project_name.replace(' ', '_')}_report.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 )
-# Chuyển biểu đồ sang ảnh PNG
-bar_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-pie1_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-pie2_img = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+# 1. Biểu đồ cột: Cost Comparison
+bar_chart_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
+plt.figure(figsize=(8, 5))
+df_bar = pd.DataFrame({
+    "Category": list(est_cost.keys()),
+    "Estimated": list(est_cost.values()),
+    "Actual": [act_cost[k] for k in est_cost.keys()]
+})
+df_bar.set_index("Category").plot(kind='bar')
+plt.title("Cost Comparison by Category")
+plt.ylabel("USD")
+plt.tight_layout()
+plt.savefig(bar_chart_path)
+plt.close()
 
-pio.write_image(fig3, bar_img.name, format='png', width=900, height=500)
-pio.write_image(fig1, pie1_img.name, format='png', width=500, height=400)
-pio.write_image(fig2, pie2_img.name, format='png', width=500, height=400)
+# 2. Biểu đồ tròn: Estimated Cost Composition
+pie1_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
+plt.figure(figsize=(5, 5))
+plt.pie(list(est_cost.values()), labels=list(est_cost.keys()), autopct='%1.1f%%')
+plt.title("Estimated Cost Composition")
+plt.tight_layout()
+plt.savefig(pie1_path)
+plt.close()
 
-# Tạo PDF
+# 3. Biểu đồ tròn: Actual Cost Composition
+pie2_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
+plt.figure(figsize=(5, 5))
+plt.pie(list(act_cost.values()), labels=list(act_cost.keys()), autopct='%1.1f%%')
+plt.title("Actual Cost Composition")
+plt.tight_layout()
+plt.savefig(pie2_path)
+plt.close()
+
+# === Tạo PDF với biểu đồ
 pdf = FPDF(orientation='P', unit='mm', format='A4')
 pdf.add_page()
-
-# Tiêu đề
 pdf.set_font("Arial", 'B', 14)
 pdf.cell(0, 10, "Project Cost Summary Report", ln=True)
 
-# Project Info
 pdf.set_font("Arial", '', 12)
 pdf.cell(0, 10, f"Project: {project_name}", ln=True)
 pdf.cell(0, 10, f"Duration: {start_date} to {end_date}", ln=True)
 pdf.ln(5)
 
-# Final Summary Table
 pdf.set_font("Arial", 'B', 12)
 pdf.cell(0, 10, "Final Summary", ln=True)
 pdf.set_font("Arial", '', 11)
 for idx, row in final_df.iterrows():
     pdf.cell(0, 8, f"{row['Item']}: {row['Value (USD)']}", ln=True)
 
-# Xuất ra PDF file trong bộ nhớ
+pdf.ln(5)
+pdf.set_font("Arial", 'B', 12)
+pdf.cell(0, 10, "Charts", ln=True)
+pdf.image(bar_chart_path, w=180)
+pdf.image(pie1_path, x=10, w=90)
+pdf.image(pie2_path, x=110, w=90)
+
 pdf_output = io.BytesIO()
 pdf.output(pdf_output)
 pdf_output.seek(0)
 
-# Nút tải PDF
 st.download_button(
-    label="📄 Download PDF Report (No Chart)",
+    label="📄 Download PDF Report (with Charts)",
     data=pdf_output,
-    file_name=f"{project_name.replace(' ', '_')}_summary.pdf",
+    file_name=f"{project_name.replace(' ', '_')}_report.pdf",
     mime="application/pdf"
 )
