@@ -37,24 +37,24 @@ end_date = st.date_input("End Date")
 st.markdown("### 1. Input Estimate and Actual Data")
 
 with st.expander("🔧 Estimated Cost Input"):
-    est_labor_worker = st.number_input("Estimated Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f")
-    est_labor_office = st.number_input("Estimated Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f")
+    est_labor_worker = round(st.number_input("Estimated Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f"), 2)
+    est_labor_office = round(st.number_input("Estimated Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f"), 2)
     est_machine = {}
     for machine in MACHINE_COST:
-        est_machine[machine] = st.number_input(f"Estimated Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f")
-    est_material = st.number_input("Estimated Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
+        est_machine[machine] = round(st.number_input(f"Estimated Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f"), 2)
+    est_material = round(st.number_input("Estimated Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f"), 2)
 
 with st.expander("📌 Actual Cost Input"):
-    act_labor_worker = st.number_input("Actual Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f")
-    act_labor_office = st.number_input("Actual Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f")
+    act_labor_worker = round(st.number_input("Actual Labor Hours - Worker", min_value=0.0, step=0.1, format="%.2f"), 2)
+    act_labor_office = round(st.number_input("Actual Labor Hours - Office", min_value=0.0, step=0.1, format="%.2f"), 2)
     act_machine = {}
     for machine in MACHINE_COST:
-        act_machine[machine] = st.number_input(f"Actual Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f")
-    act_material = st.number_input("Actual Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
+        act_machine[machine] = round(st.number_input(f"Actual Machine Hours - {machine}", min_value=0.0, step=0.1, format="%.2f"), 2)
+    act_material = round(st.number_input("Actual Material Cost (USD)", min_value=0.0, step=1.0, format="%.2f"), 2)
 
 with st.expander("🛠️ Additional Actual Cost: Warranty & Afterwork"):
-    warranty_cost = st.number_input("Warranty Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
-    afterwork_cost = st.number_input("Afterwork Cost (USD)", min_value=0.0, step=1.0, format="%.2f")
+    warranty_cost = round(st.number_input("Warranty Cost (USD)", min_value=0.0, step=1.0, format="%.2f"), 2)
+    afterwork_cost = round(st.number_input("Afterwork Cost (USD)", min_value=0.0, step=1.0, format="%.2f"), 2)
 
 # === Calculations ===
 est_cost = {
