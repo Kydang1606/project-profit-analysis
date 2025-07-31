@@ -22,7 +22,9 @@ MACHINE_COST = {
 
 st.set_page_config(page_title="Cost Estimation Tool", layout="wide")
 st.title("📊 Cost Estimation & Comparison Dashboard")
-
+# Hiển thị logo trong giao diện
+logo = Image.open("triac_logo.png")
+st.image(logo, width=150)  # bạn có thể chỉnh width nếu cần
 # === Project Info ===
 st.markdown("### 📁 Project Information")
 project_name = st.text_input("Project Name")
@@ -222,6 +224,13 @@ if sum(act_cost.values()) > 0:
 # === Tạo PDF với biểu đồ
 pdf = FPDF(orientation='P', unit='mm', format='A4')
 pdf.add_page()
+
+# Thêm logo nếu tồn tại
+logo_path = "triac_logo.png"
+if os.path.exists(logo_path):
+    pdf.image(logo_path, x=10, y=10, w=40)
+    pdf.ln(25)  # đẩy nội dung xuống tránh đè lên logo
+
 pdf.set_font("Arial", 'B', 14)
 pdf.cell(0, 10, "Project Cost Summary Report", ln=True)
 
