@@ -200,22 +200,24 @@ plt.close()
 
 # 2. Biểu đồ tròn: Estimated Cost Composition
 pie1_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
-plt.figure(figsize=(5, 5))
-plt.pie(list(est_cost.values()), labels=list(est_cost.keys()), autopct='%1.1f%%')
-plt.title("Estimated Cost Composition")
-plt.tight_layout()
-plt.savefig(pie1_path)
-plt.close()
+if sum(est_cost.values()) > 0:
+    plt.figure(figsize=(5, 5))
+    plt.pie(list(est_cost.values()), labels=list(est_cost.keys()), autopct='%1.1f%%')
+    plt.title("Estimated Cost Composition")
+    plt.tight_layout()
+    plt.savefig(pie1_path)
+    plt.close()
 
 # 3. Biểu đồ tròn: Actual Cost Composition
 pie2_path = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
-plt.figure(figsize=(5, 5))
-plt.pie(list(act_cost.values()), labels=list(act_cost.keys()), autopct='%1.1f%%')
-plt.title("Actual Cost Composition")
-plt.tight_layout()
-plt.savefig(pie2_path)
-plt.close()
-
+if sum(act_cost.values()) > 0:
+    plt.figure(figsize=(5, 5))
+    plt.pie(list(act_cost.values()), labels=list(act_cost.keys()), autopct='%1.1f%%')
+    plt.title("Actual Cost Composition")
+    plt.tight_layout()
+    plt.savefig(pie2_path)
+    plt.close()
+    
 # === Tạo PDF với biểu đồ
 pdf = FPDF(orientation='P', unit='mm', format='A4')
 pdf.add_page()
